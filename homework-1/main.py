@@ -22,7 +22,7 @@ connection = psycopg2.connect(host='Localhost', database='north', user='postgres
 
 
 def load_data_to_table(table_name: str, file_path: str):
-    """Метод для загрузки данных из csv в таблицу"""
+    """Загружает данные  из csv в таблицу"""
     with connection.cursor() as cursor:
         with open(file_path, 'r', newline='', encoding='utf-8') as file:
             reader = csv.reader(file)
