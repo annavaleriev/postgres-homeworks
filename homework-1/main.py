@@ -1,62 +1,45 @@
 import csv
 
 import psycopg2
-from psycopg2 import sql
+
 
 connection = psycopg2.connect(host='localhost', database='north', user='postgres', password='30051980')
 
 
-# try:
-#     with connection.cursor() as cursor:
-#         with open('north_data/customers_data.csv', 'r') as file:
-#             reader = csv.reader(file)
-#             next(reader)
-#
-#             for row in reader:
-#                 cursor.execute("INSERT INTO customers VALUES (%s, %s, %s)", row)
-#     connection.commit()
-#
-# finally:
-#     connection.close()
-
-
-def load_fixtures(file_path, table_name):
+def load_fixtures(file_path: str, table_name: str) -> None:
+    """Метод, который загружает данные из CSV-файла в таблицу базы данных"""
+    # Открытие курсора для взаимодействия с базой данных
     with connection.cursor() as cursor:
+        # Открытие файла cvs с данными для чтения
         with open(file_path, 'r') as file:
+            # Создание объекта DictReader, который позволяет читать CSV файл как словарь,
+            # где ключами являются имена столбцов.
             reader = csv.DictReader(file)
 
+            # Итерация по строкам в CSV файле
             for row in reader:
-                cursor.execute("INSERT INTO %s VALUES %s" % (table_name, tuple(row.values())))
+                # Создание строки с именами столбцов и строки с заполнителями %s для значений. %s здесь используется
+                # как заполнитель для параметров, которые будут вставлены в запрос. Это защищает от SQL-инъекций
+                # и обеспечивает безопасное выполнение запросов.
+                columns = ', '.join(row.keys())
+                values = ', '.join(['%s'] * len(row))
+                # Формирование SQL запроса для вставки данных в таблицу table_name из CSV файла. ON CONFLICT DO NOTHING
+                # - это часть SQL синтаксиса PostgreSQL, которая указывает базе данных не выполнять вставку,
+                # если встречается конфликт (например, дубликат ключа)
+                query = f"INSERT INTO {table_name} ({columns}) VALUES ({values}) ON CONFLICT DO NOTHING"
+
+                # Выполнение SQL запроса с передачей значений в качестве параметров для вставки. row.values() содержит
+                # значения для текущей строки CSV файла. tuple(row.values()) преобразует значения в кортеж,
+                # который передается в качестве параметров в запрос.
+                cursor.execute(query, tuple(row.values()))
 
 
+# Загрузка данных из CSV файлов в таблицы базы данных
 load_fixtures('north_data/customers_data.csv', "customers")
 load_fixtures('north_data/employees_data.csv', "employees")
 load_fixtures('north_data/orders_data.csv', "orders")
 
+# Сохранение изменений в базе данных
 connection.commit()
+# Закрытие соединения с базой данных
 connection.close()
-
-# def load_data_to_table(table_name: str, file_path: str):
-#     """Загружает данные из csv в таблицу"""
-#     with connection.cursor() as cursor:
-#         with open(file_path, 'r', newline='', encoding='utf-8') as file:
-#             reader = csv.reader(file)
-#             next(reader)  # пропускаем 1ю строчку
-#
-#             for row in reader:
-#                 # подготовка запроса для вставки данных
-#                 insert_query = sql.SQL("INSERT INTO {} VALUES ({})").format(
-#                     sql.Identifier(table_name),
-#                     sql.SQL(', ').join(map(sql.Literal, row))
-#                 )
-#                 # выполнение запроса
-#                 cursor.execute(insert_query)
-#
-#     connection.commit()
-#
-#
-# # загрузка данных из csv в таблицы
-# load_data_to_table('employees', 'north_data/employees_data.csv')
-# load_data_to_table('orders', 'north_data/orders_data.csv')
-#
-# connection.close()
