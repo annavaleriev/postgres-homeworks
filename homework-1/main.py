@@ -1,9 +1,12 @@
 import csv
+import os
 
 import psycopg2
 
+DB_PASSWORD = os.getenv('DB_PASSWORD')
 
-connection = psycopg2.connect(host='localhost', database='north', user='postgres', password='30051980')
+# Установка соединения с базой данных. Psycopg2 - это библиотека для работы с базой данных PostgreSQL.
+connection = psycopg2.connect(host='localhost', database='north', user='postgres', password=DB_PASSWORD)
 
 
 def load_fixtures(file_path: str, table_name: str) -> None:
