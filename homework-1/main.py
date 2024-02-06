@@ -1,9 +1,17 @@
+import configparser
 import csv
-import os
+
 
 import psycopg2
 
-DB_PASSWORD = os.getenv('DB_PASSWORD')
+from settings import CONFIG_PATH
+
+# Чтение кофигурационного файла
+config = configparser.ConfigParser()
+config.read(CONFIG_PATH)
+
+# Получение пароля для подключения к базе данных
+DB_PASSWORD = config['database']['DB_PASSWORD']
 
 # Установка соединения с базой данных. Psycopg2 - это библиотека для работы с базой данных PostgreSQL.
 connection = psycopg2.connect(host='localhost', database='north', user='postgres', password=DB_PASSWORD)
