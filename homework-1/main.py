@@ -37,7 +37,7 @@ def load_fixtures(file_path: str, table_name: str) -> None:
                 # Формирование SQL запроса для вставки данных в таблицу table_name из CSV файла. ON CONFLICT DO NOTHING
                 # - это часть SQL синтаксиса PostgreSQL, которая указывает базе данных не выполнять вставку,
                 # если встречается конфликт (например, дубликат ключа)
-                query = f"INSERT INTO {table_name} ({columns}) VALUES ({values}) ON CONFLICT DO NOTHING"
+                query = "INSERT INTO %s (%s) VALUES (%s) ON CONFLICT DO NOTHING" % (table_name, columns, values)
 
                 # Выполнение SQL запроса с передачей значений в качестве параметров для вставки. row.values() содержит
                 # значения для текущей строки CSV файла. tuple(row.values()) преобразует значения в кортеж,
@@ -49,6 +49,7 @@ def load_fixtures(file_path: str, table_name: str) -> None:
 load_fixtures('north_data/customers_data.csv', "customers")
 load_fixtures('north_data/employees_data.csv', "employees")
 load_fixtures('north_data/orders_data.csv', "orders")
+
 
 # Сохранение изменений в базе данных
 connection.commit()
