@@ -4,7 +4,6 @@ select distinct ship_city, ship_country
 from orders o 
 where ship_city like '%burg';
 
-
 -- 2. из таблицы orders идентификатор заказа, идентификатор заказчика, вес и страну отгрузки. Заказ отгружен в страны, начинающиеся на 'P'. Результат отсортирован по весу (по убыванию). Вывести первые 10 записей.
 select order_id , customer_id , freight , ship_country 
 from orders o 
@@ -15,7 +14,8 @@ limit 10;
 -- 3. имя, фамилию и телефон сотрудников, у которых в данных отсутствует регион (см таблицу employees)
 select first_name, last_name , home_phone 
 from employees
-where region is null; 
+where region is null;
+
 -- 4. количество поставщиков (suppliers) в каждой из стран. Результат отсортировать по убыванию количества поставщиков в стране
 select count(*) as count_suppliers, country 
 from suppliers
@@ -30,8 +30,6 @@ group by ship_country
 having sum(freight) > 2750
 order by sum(freight) desc;
 
-
-
 -- 6. страны, в которых зарегистрированы и заказчики (customers) и поставщики (suppliers) и работники (employees).
 select country 
 from customers
@@ -42,8 +40,6 @@ intersect
 select country 
 from employees;
 
-
-
 -- 7. страны, в которых зарегистрированы и заказчики (customers) и поставщики (suppliers), но не зарегистрированы работники (employees).
 select country 
 from customers
@@ -53,5 +49,3 @@ from suppliers
 except
 select country 
 from employees; 
-
-
