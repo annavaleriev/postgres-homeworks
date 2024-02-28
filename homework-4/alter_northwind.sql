@@ -15,3 +15,13 @@ where discontinued = 1
 delete from order_details
 where product_id in (select product_id from products where discontinued = 1);
 delete from products where discontinued = 1;
+
+alter table order_details
+drop constraint fk_order_details_products;
+
+delete from products
+where discontinued = 1;
+
+alter table order_details
+add constraint fk_order_details_products
+foreign key (product_id) references products (product_id);
